@@ -1,12 +1,13 @@
-
 package co.edu.uniquindio.poo;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
+
 
 /**
  * Clase para manejar la información de un curso
@@ -47,10 +48,13 @@ public class Curso {
      * @param estudiante Estudiante que se desea agregar
      */
     public void agregarEstudiante(Estudiante estudiante) {
-        assert validarNumeroIdentificacionExiste(estudiante.getNumeroIdentificacion()) == false
-                : "El número de identificación ya existe.";
-        estudiantes.add(estudiante);
+        if (!validarNumeroIdentificacionExiste(estudiante.getNumeroIdentificacion())) {
+            estudiantes.add(estudiante);
+        } else {
+            throw new AssertionError("El número de identificación ya existe.");
+        }
     }
+    
 
     /**
      * Método privado para determinar si ya existe un estudiante registro en el
@@ -61,10 +65,12 @@ public class Curso {
      *         registrado.
      */
     private boolean validarNumeroIdentificacionExiste(String numeroIdentificacion) {
-
-        Predicate<Estudiante> condicion = estudiante -> estudiante.getNumeroIdentificacion()
-                .equals(numeroIdentificacion);
-        return estudiantes.stream().filter(condicion).findAny().isPresent();
+        for (Estudiante estudiante : estudiantes) {
+            if (estudiante.getNumeroIdentificacion().equals(numeroIdentificacion)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -73,10 +79,14 @@ public class Curso {
      * @param numeroIdenficacion Número de identificación del estudiante a buscar
      * @return Estudiante con el número de indicación indicado o null
      */
-    public Optional<Estudiante> obtenerEstudiante(String numeroIdenficacion) {
-        Predicate<Estudiante> condicion = estudiante -> estudiante.getNumeroIdentificacion().equals(numeroIdenficacion);
-
-        return estudiantes.stream().filter(condicion).findAny();
+    public Optional<Estudiante> obtenerEstudiante(String numeroIdentificacion) {
+        for (Estudiante estudiante : estudiantes) {
+            if (estudiante.getNumeroIdentificacion().equals(numeroIdentificacion)) {
+                return Optional.of(estudiante);
+            }
+        }
+    
+        return Optional.empty();
     }
 
     /**
@@ -96,8 +106,9 @@ public class Curso {
      *         orden alfabético
      */
     public Collection<Estudiante> obtenerListadoAlfabetico() {
-        var comparador = Comparator.comparing(Estudiante::getNombres);
-        var estudiantesOrdenados = estudiantes.stream().sorted(comparador).toList();
+        List<Estudiante> estudiantesOrdenados = new ArrayList<>(estudiantes);
+        Comparator<Estudiante> comparador = Comparator.comparing(Estudiante::getNombres);
+        estudiantesOrdenados.sort(comparador);
         return Collections.unmodifiableCollection(estudiantesOrdenados);
     }
 
@@ -109,8 +120,9 @@ public class Curso {
      *         en el curso descendente por edad.
      */
     public Collection<Estudiante> obtenerListadoEdadDescendente() {
-        var comparador = Comparator.comparing(Estudiante::getEdad).reversed();
-        var estudiantesOrdenados = estudiantes.stream().sorted(comparador).toList();
+        List<Estudiante> estudiantesOrdenados = new ArrayList<>(estudiantes);
+        Comparator<Estudiante> comparador = Comparator.comparing(Estudiante::getEdad).reversed();
+        estudiantesOrdenados.sort(comparador);
         return Collections.unmodifiableCollection(estudiantesOrdenados);
     }
 
@@ -122,9 +134,15 @@ public class Curso {
      *         son menores de edad.
      */
     public Collection<Estudiante> obtenerListadoMenoresEdad() {
-        return estudiantes.stream()
-                .filter(estudiante -> estudiante.getEdad() < 18)
-                .toList();
+        List<Estudiante> listadoMenoresEdad = new ArrayList<>();
+    
+        for (Estudiante estudiante : estudiantes) {
+            if (estudiante.getEdad() < 18) {
+                listadoMenoresEdad.add(estudiante);
+            }
+        }
+    
+        return listadoMenoresEdad;
     }
 
     /**
@@ -144,11 +162,13 @@ public class Curso {
      * @return nota parcial encontrada o un excepción de no entrada.
      */
     public NotaParcial getNotaParcial(String nombreNotaParcial) {
-        Predicate<NotaParcial> nombreIgual = j -> j.nombre().equals(nombreNotaParcial);
-        var posibleNotaParcial = notasParciales.stream().filter(nombreIgual).findAny();
-        assert posibleNotaParcial.isPresent();
-
-        return posibleNotaParcial.get();
+        for (NotaParcial notaParcial : notasParciales) {
+            if (notaParcial.nombre().equals(nombreNotaParcial)) {
+                return notaParcial;
+            }
+        }
+    
+        return null;
     }
 
     /**
@@ -157,10 +177,15 @@ public class Curso {
      */
     public Collection<Estudiante> obtenerListadoMayorNota() {
         double mayorNota = obtenerMayorNota();
-
-        return estudiantes.stream()
-                .filter(estudiante -> mayorNota - estudiante.getDefinitiva() <= App.PRECISION)
-                .toList();
+        List<Estudiante> listadoMayorNota = new ArrayList<>();
+    
+        for (Estudiante estudiante : estudiantes) {
+            if (Math.abs(mayorNota - estudiante.getDefinitiva()) <= App.PRECISION) {
+                listadoMayorNota.add(estudiante);
+            }
+        }
+    
+        return listadoMayorNota;
     }
 
     /**
@@ -168,8 +193,15 @@ public class Curso {
      * @return mayor nota definitiva de los estudiantes del curso.
      */
     private double obtenerMayorNota() {
-        double mayorNota = estudiantes.stream().map(e -> e.getDefinitiva()).max(Double::compare).get();
-
+        double mayorNota = Double.MIN_VALUE;
+    
+        for (Estudiante estudiante : estudiantes) {
+            double definitiva = estudiante.getDefinitiva();
+            if (definitiva > mayorNota) {
+                mayorNota = definitiva;
+            }
+        }
+    
         return mayorNota;
     }
 
@@ -178,11 +210,17 @@ public class Curso {
      * @return colección de los estudiantes que perdieron en orden alfabético.
      */
     public Collection<Estudiante> obtenerListadoAlfabeticoPerdieron() {
-        var comparador = Comparator.comparing(Estudiante::getNombres);
-        return estudiantes.stream()
-                .filter(estudiante -> estudiante.getDefinitiva() < App.MINIMA_NOTA)
-                .sorted(comparador)
-                .toList();
+        List<Estudiante> listadoAlfabeticoPerdieron = new ArrayList<>();
+    
+        for (Estudiante estudiante : estudiantes) {
+            if (estudiante.getDefinitiva() < App.MINIMA_NOTA) {
+                listadoAlfabeticoPerdieron.add(estudiante);
+            }
+        }
+    
+        listadoAlfabeticoPerdieron.sort(Comparator.comparing(Estudiante::getNombres));
+    
+        return listadoAlfabeticoPerdieron;
     }
 
     /**
