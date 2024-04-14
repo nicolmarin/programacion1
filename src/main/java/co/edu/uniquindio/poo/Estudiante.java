@@ -35,13 +35,31 @@ public class Estudiante {
      */
     public Estudiante(String nombres, String apellidos, String numeroIdentificacion, String correo, String telefono,
             int edad) {
-        assert nombres != null && !nombres.isBlank() : "El nombre debe ser diferente de null";
-        assert apellidos != null && !apellidos.isBlank() : "El apellido debe ser diferente de null";
-        assert numeroIdentificacion != null && !numeroIdentificacion.isBlank()
-                : "El número de identificación debe ser diferente de null";
-        assert correo != null && correo.contains("@") : "El correo electrónico debe contener el símbolo @";
-        assert telefono != null : "El teléfono no puede ser null";
-        assert edad > 0 : "La edad debe ser mayor a cero";
+     ///   assert nombres != null && !nombres.isBlank() : "El nombre debe ser diferente de null";
+        if (nombres == null || nombres.isBlank()){
+            throw new IllegalArgumentException("El nombre debe ser diferente de null. ");
+        }
+     ///  assert apellidos != null && !apellidos.isBlank() : "El apellido debe ser diferente de null";
+        if (apellidos == null || apellidos.isBlank()){
+            throw new IllegalArgumentException("El apellido debe ser diferente de null. ");
+        }
+     /// assert numeroIdentificacion != null && !numeroIdentificacion.isBlank()
+     ///          : "El número de identificación debe ser diferente de null";
+        if (numeroIdentificacion == null || numeroIdentificacion.isBlank()){
+            throw new IllegalArgumentException("El numero de identificación debe ser diferente de null");
+        }
+     ///assert correo != null && correo.contains("@") : "El correo electrónico debe contener el símbolo @";
+        if (correo == null || !correo.contains("@")){
+            throw new IllegalArgumentException("El correo electrónico debe contener el símbolo @. ");
+        }
+     ///assert telefono != null : "El teléfono no puede ser null";
+        if (telefono == null){
+            throw new IllegalArgumentException("El teléfono no puede ser null. ");
+        }
+     ///assert edad > 0 : "La edad debe ser mayor a cero";
+        if (edad <= 0){
+            throw new IllegalArgumentException("La edad debe ser mayor a cero. ");
+        }
 
         this.nombres = nombres;
         this.apellidos = apellidos;
@@ -114,8 +132,10 @@ public class Estudiante {
      * @param asistencia asistencia del estudiante
      */
     public void agregarAsistencia(Asistencia asistencia) {
-        assert asistencia != null : "Error la asistencia no puede nulo";
-
+    ///assert asistencia != null : "Error la asistencia no puede nulo";
+        if(asistencia == null){
+            throw new IllegalArgumentException("Error, la asistencia no puede ser null. ");
+        } 
         asistencias.add(asistencia);
     }
 
