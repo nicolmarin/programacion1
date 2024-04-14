@@ -17,8 +17,15 @@ public record NotaParcial(String nombre, double porcentaje) {
      * @param porcentaje valor del peso (porcentaje) de la nota en el curso
      */
     public NotaParcial{
-        assert nombre != null && !nombre.isBlank() : "El nombre no puede se nulo ni vacío";
-        assert porcentaje > 0.0 : "El porcentaje no puede ser negativo";
-        assert porcentaje <= 1.0 : "El porcentaje no puede ser mayor que 1.0 (100%)";
+       /// assert nombre != null && !nombre.isBlank() : "El nombre no puede se nulo ni vacío";
+        if (nombre == null || nombre.isBlank()){
+            throw new IllegalArgumentException("El nombre no puede ser nulo o estar en blanco. ");
+        }
+        if (porcentaje < 0){
+            throw new IllegalArgumentException("El porcentaje no puede ser negativo. ");
+        }
+        if (porcentaje > 1){
+            throw new IllegalArgumentException("El porcentaje no puede ser mayor que 1.0 (100%)");
+        }
     }
 }
