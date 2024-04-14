@@ -1,11 +1,12 @@
-# problema02
+# demo
 
 Descripciín basisca de su Proyecto de POO ...
 
 # Autores
 
-- Autor 1
-- Autor 2
+- Nicol Marin
+- David Arango
+- Valery 
 
 # Herramientas
 
@@ -37,5 +38,5 @@ Para generar el jar puede usar el comando:
 y para ejecutar el jar
 
 ```shell
- java -jar target/problema02-1.0.jar
+ java -jar target/demo-1.0.jar
 ```

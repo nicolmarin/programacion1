@@ -3,7 +3,6 @@ package co.edu.uniquindio.poo;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -22,7 +21,7 @@ public class Estudiante {
     private final String correo;
     private final String telefono;
     private final int edad;
-    private final Collection<NotaObtenida> notasObtenidas;
+    private final Collection<Asistencia> asistencias;
 
     /**
      * Método constructor de la clase Estudiante
@@ -36,13 +35,25 @@ public class Estudiante {
      */
     public Estudiante(String nombres, String apellidos, String numeroIdentificacion, String correo, String telefono,
             int edad) {
-        assert nombres != null && !nombres.isBlank() : "El nombre debe ser diferente de null";
-        assert apellidos != null && !apellidos.isBlank() : "El apellido debe ser diferente de null";
-        assert numeroIdentificacion != null && !numeroIdentificacion.isBlank()
-                : "El número de identificación debe ser diferente de null";
-        assert correo != null && correo.contains("@") : "El correo electrónico debe contener el símbolo @";
-        assert telefono != null : "El teléfono no puede ser null";
-        assert edad > 0 : "La edad debe ser mayor a cero";
+
+        if (nombres == null || nombres.isBlank()){
+            throw new IllegalArgumentException("El nombre debe ser diferente de null. ");
+        }
+        if (apellidos == null || apellidos.isBlank()){
+            throw new IllegalArgumentException("El apellido debe ser diferente de null. ");
+        }
+        if (numeroIdentificacion == null || numeroIdentificacion.isBlank()){
+            throw new IllegalArgumentException("El numero de identificación debe ser diferente de null");
+        }
+        if (correo == null || !correo.contains("@")){
+            throw new IllegalArgumentException("El correo electrónico debe contener el símbolo @. ");
+        }
+        if (telefono == null){
+            throw new IllegalArgumentException("El teléfono no puede ser null. ");
+        }
+        if (edad <= 0){
+            throw new IllegalArgumentException("La edad debe ser mayor a cero. ");
+        }
 
         this.nombres = nombres;
         this.apellidos = apellidos;
@@ -51,7 +62,7 @@ public class Estudiante {
         this.telefono = telefono;
         this.edad = edad;
 
-        this.notasObtenidas = new LinkedList<>();
+        this.asistencias = new LinkedList<>();
     }
 
     /**
@@ -109,106 +120,46 @@ public class Estudiante {
     }
 
     /**
-     * Método para adicionar una nota obtenida al estudiante
+     * Método para agregar una asistencia a un estudiante.
+     * TODO evitar agregar más de una vez una misma asistencia.
      * 
-     * @param notaObtenida nota obtenida por el estudiante
+     * @param asistencia asistencia del estudiante
      */
-    public void adicionarNotaObtenida(NotaObtenida notaObtenida) {
-        verificarExistenciaNotaObtenida(notaObtenida);
-        notasObtenidas.add(notaObtenida);
+    public void agregarAsistencia(Asistencia asistencia) {
+    ///assert asistencia != null : "Error la asistencia no puede nulo";
+        if(asistencia == null){
+            throw new IllegalArgumentException("Error, la asistencia no puede ser null. ");
+        } 
+        asistencias.add(asistencia);
     }
 
     /**
-     * Método de apoyo (privado) para verificar si existe o no la nota obtenida que
-     * se desea adicionar
+     * Método para obtener la colección no modifiable de las asistencias.
      * 
-     * @param notaObtenida nota obtenida que se quiere verificar que NO exista.
+     * @return colección no modificable de las asistencias.
      */
-    private void verificarExistenciaNotaObtenida(NotaObtenida notaObtenida) {
-        Predicate<NotaObtenida> nombreIgual = j -> j.getNotaParcial().nombre()
-                .equals(notaObtenida.getNotaParcial().nombre());
-        assert !notasObtenidas.stream().filter(nombreIgual).findAny().isPresent();
+    public Collection<Asistencia> getAsistencias() {
+        return Collections.unmodifiableCollection(asistencias);
     }
 
     /**
-     * Método para obtener la nota obtenida dado el nombre de la nota parcial
      * 
-     * @param nombreNotaParcial nombre de la nota parcial que se desea buscar.
-     * @return la nota obtenida asociada a la nota parcial
+     * @param claseCurso
+     * @return
      */
-    public NotaObtenida getNotaObtenida(String nombreNotaParcial) {
-        var posibleNotaObtenida = buscarNotaParcial(nombreNotaParcial);
-        assert posibleNotaObtenida.isPresent();
-
-        return posibleNotaObtenida.get();
+    public boolean asistioClase(ClaseCurso claseCurso) {
+        /// Se inicializa la variable que vamos a retornear de tipo boolean
+        boolean asistenciaPresente = false;      
+        
+        /// creamos un ciclo for que itere en cada asistencia y, creamos un condicional que compare los parametros establecidos.
+        for (Asistencia asistencia : asistencias){
+            /// verificamos que sea igual a la fecha que se quiere y, luego verificamos que la asistencia sea igual a presente.
+            if (claseCurso.fechaClase().isEqual(claseCurso.fechaClase()) && asistencia.tipoAsistencia() == TipoAsistencia.PRESENTE){
+                asistenciaPresente = true;
+                /// el break es porque ya encontre que sí asistió, entonces no necesita que termine de iterar
+                break;
+            }
+        }
+        return asistenciaPresente;
     }
-
-    /**
-     * Método de apoyo (privado) para buscar una posible nota obtenida asociada a
-     * una nota parcial
-     * 
-     * @param nombreNotaParcial nombre de la nota parcial asociada a la nota
-     *                          obtenida
-     * @return posible nota obtenida (si existe) asociada a la nota parcial del
-     *         nombre indicado
-     */
-    private Optional<NotaObtenida> buscarNotaParcial(String nombreNotaParcial) {
-        Predicate<NotaObtenida> nombreIgual = j -> j.getNotaParcial().nombre().equals(nombreNotaParcial);
-        var posibleNotaObtenida = notasObtenidas.stream().filter(nombreIgual).findAny();
-
-        return posibleNotaObtenida;
-    }
-
-    /**
-     * Método para obtener una colección NO modificable de las notas parciales del
-     * curso.
-     * 
-     * @return colección no modificable de las notas parciales del curso
-     */
-    public Collection<NotaObtenida> getNotasObtenidas() {
-        return Collections.unmodifiableCollection(notasObtenidas);
-    }
-
-    /**
-     * Método para actualizar la nota que tiene una nota obtenida por el estudiante
-     * 
-     * @param nombreNotaParcial nombre de la nota parcial a la que la nota está
-     *                          asociada
-     * @param notaObtenida      nueva nota obtenida
-     */
-    public void setNotaObtenida(String nombreNotaParcial, double notaObtenida) {
-        assert notaObtenida >= 0.0 : "La nota obtenida no puede ser menor a cero";
-        assert notaObtenida <= 5.0 : "La nota obtenida no puede ser mayor a cinco";
-        Predicate<NotaObtenida> nombreIgual = j -> j.getNotaParcial().nombre().equals(nombreNotaParcial);
-        var notaObtenidaActual = notasObtenidas.stream().filter(nombreIgual).findAny();
-        assert notaObtenidaActual.isPresent();
-
-        notaObtenidaActual.get().setNotaObtenida(notaObtenida);
-    }
-
-    /**
-     * Método para obtener la nota definitiva usando un promedio ponderado suma de
-     * todas (nota * porcentaje)
-     * 
-     * @return nota definitiva
-     */
-    public double getDefinitiva() {
-        validarNotas100Porciento();
-
-        double definitiva = notasObtenidas.stream()
-                .mapToDouble(n -> (n.getNotaObtenida() * n.getNotaParcial().porcentaje())).sum();
-
-        return definitiva;
-    }
-
-    /**
-     * Método de apoyo (privado) para validar que la suma del porcentaje de las
-     * notas obtenidas sea 1.0 (100%)
-     */
-    private void validarNotas100Porciento() {
-        double pesoNotas = notasObtenidas.stream()
-                .mapToDouble(n -> n.getNotaParcial().porcentaje()).sum();
-        assert (1.0 - pesoNotas) <= App.PRECISION : "Las notas parciales no suman 1.0 (100%)";
-    }
-
 }
