@@ -27,7 +27,9 @@ public class Curso {
      * @param nombre Nombre del curso
      */
     public Curso(String nombre) {
-        assert nombre != null : "El nombre no puede ser nulo";
+        if (nombre == null){
+            throw new IllegalArgumentException("El nombre no puede ser nulo");
+        }
         this.nombre = nombre;
         estudiantes = new LinkedList<>();
         notasParciales = new LinkedList<>();
