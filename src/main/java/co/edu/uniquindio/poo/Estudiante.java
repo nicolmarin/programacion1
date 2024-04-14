@@ -35,28 +35,22 @@ public class Estudiante {
      */
     public Estudiante(String nombres, String apellidos, String numeroIdentificacion, String correo, String telefono,
             int edad) {
-     ///   assert nombres != null && !nombres.isBlank() : "El nombre debe ser diferente de null";
+
         if (nombres == null || nombres.isBlank()){
             throw new IllegalArgumentException("El nombre debe ser diferente de null. ");
         }
-     ///  assert apellidos != null && !apellidos.isBlank() : "El apellido debe ser diferente de null";
         if (apellidos == null || apellidos.isBlank()){
             throw new IllegalArgumentException("El apellido debe ser diferente de null. ");
         }
-     /// assert numeroIdentificacion != null && !numeroIdentificacion.isBlank()
-     ///          : "El número de identificación debe ser diferente de null";
         if (numeroIdentificacion == null || numeroIdentificacion.isBlank()){
             throw new IllegalArgumentException("El numero de identificación debe ser diferente de null");
         }
-     ///assert correo != null && correo.contains("@") : "El correo electrónico debe contener el símbolo @";
         if (correo == null || !correo.contains("@")){
             throw new IllegalArgumentException("El correo electrónico debe contener el símbolo @. ");
         }
-     ///assert telefono != null : "El teléfono no puede ser null";
         if (telefono == null){
             throw new IllegalArgumentException("El teléfono no puede ser null. ");
         }
-     ///assert edad > 0 : "La edad debe ser mayor a cero";
         if (edad <= 0){
             throw new IllegalArgumentException("La edad debe ser mayor a cero. ");
         }
@@ -154,9 +148,18 @@ public class Estudiante {
      * @return
      */
     public boolean asistioClase(ClaseCurso claseCurso) {
-        Predicate<Asistencia> fechaIgual = j -> j.claseCurso().fechaClase().isEqual(claseCurso.fechaClase());
-        Predicate<Asistencia> asistioPresente = j -> j.tipoAsistencia() == TipoAsistencia.PRESENTE;
-        var asistencia = asistencias.stream().filter(fechaIgual.and(asistioPresente)).findAny();
-        return asistencia.isPresent();
+        /// Se inicializa la variable que vamos a retornear de tipo boolean
+        boolean asistenciaPresente = false;      
+        
+        /// creamos un ciclo for que itere en cada asistencia y, creamos un condicional que compare los parametros establecidos.
+        for (Asistencia asistencia : asistencias){
+            /// verificamos que sea igual a la fecha que se quiere y, luego verificamos que la asistencia sea igual a presente.
+            if (claseCurso.fechaClase().isEqual(claseCurso.fechaClase()) && asistencia.tipoAsistencia() == TipoAsistencia.PRESENTE){
+                asistenciaPresente = true;
+                /// el break es porque ya encontre que sí asistió, entonces no necesita que termine de iterar
+                break;
+            }
+        }
+        return asistenciaPresente;
     }
 }
