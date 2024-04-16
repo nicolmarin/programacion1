@@ -3,7 +3,6 @@ package co.edu.uniquindio.poo;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.function.Predicate;
 
 /**
  * Clase para manejar la información de un Estudiante
